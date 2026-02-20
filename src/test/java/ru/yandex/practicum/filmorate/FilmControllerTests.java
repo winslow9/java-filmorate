@@ -15,7 +15,7 @@ class FilmControllerTests {
 
     private FilmController filmController;
     private Film validFilm;
-    private final LocalDate FIRST_FILM_DATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate FIRST_FILM_DATE = LocalDate.of(1895, 12, 28);
 
     @BeforeEach
     void setUp() {
