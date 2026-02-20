@@ -30,26 +30,26 @@ public class FilmController {
     }
 
     @GetMapping
-    public Collection<Film> getAll(){
+    public Collection<Film> getAll() {
         return films.values();
     }
 
     @PostMapping
-    public Film create(@Valid @RequestBody Film film){
-        if (film.getName() == null || film.getName().trim().isBlank()){
+    public Film create(@Valid @RequestBody Film film) {
+        if (film.getName() == null || film.getName().trim().isBlank()) {
             throw new ValidationException("Название не может быть пустым");
         }
-        if (film.getDescription().length() > 200){
+        if (film.getDescription().length() > 200) {
             throw new ValidationException("Максимальная длина описания — 200 символов");
         }
-        if (film.getReleaseDate().isBefore(firstDate)){
+        if (film.getReleaseDate().isBefore(firstDate)) {
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
         }
-        if (film.getDuration()<=0){
+        if (film.getDuration() <= 0) {
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
 
-        if (films.isEmpty()){
+        if (films.isEmpty()) {
             film.setId(1L);
         } else {
             film.setId(getNextId());
@@ -61,32 +61,34 @@ public class FilmController {
         film.setReleaseDate(film.getReleaseDate());
         films.put(film.getId(), film);
 
-        log.info("Создан фильм с id "+film.getId());
+        log.info("Создан фильм с id " + film.getId());
         return films.get(film.getId());
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film film){
-        if (film.getId() == null){
+    public Film update(@Valid @RequestBody Film film) {
+        if (film.getId() == null) {
             throw new ValidationException("ID пользователя должен быть указан");
-        } if (films.keySet().contains(film.getId())){
+        }
+        if (films.keySet().contains(film.getId())) {
             Film oldFilm = films.get(film.getId());
-            if (film.getDuration() != null){
+            if (film.getDuration() != null) {
                 oldFilm.setDescription(film.getDescription());
             }
-            if (film.getName() != null){
+            if (film.getName() != null) {
                 oldFilm.setName(film.getName());
             }
-            if (film.getDuration() != null){
+            if (film.getDuration() != null) {
                 oldFilm.setDuration(film.getDuration());
             }
-            if (film.getReleaseDate() != null){
+            if (film.getReleaseDate() != null) {
                 oldFilm.setReleaseDate(film.getReleaseDate());
             }
-            log.info("Изменен фильм с id "+film.getId());
+            log.info("Изменен фильм с id " + film.getId());
             return oldFilm;
-        }else
-        { throw new NotFoundException("Фильм с таким id не найден");}
+        } else {
+            throw new NotFoundException("Фильм с таким id не найден");
+        }
     }
 
 }
