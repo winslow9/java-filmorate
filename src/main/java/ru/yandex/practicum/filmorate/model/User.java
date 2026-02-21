@@ -12,7 +12,6 @@ import java.time.LocalDate;
 @Builder
 public class User {
     private Long id;
-    @NonNull
     @NotBlank
     private String login;
     private String name;

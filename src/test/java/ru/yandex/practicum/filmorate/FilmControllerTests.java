@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate;
 
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -28,6 +29,7 @@ class FilmControllerTests {
                 .build();
     }
 
+    @DisplayName("Добавить фильм")
     @Test
     void createFilm_WithValidData_ShouldSuccess() {
         Film created = filmController.create(validFilm);
@@ -40,6 +42,7 @@ class FilmControllerTests {
     }
 
 
+    @DisplayName("Добавить фильм без названия")
     @Test
     void createFilm_WithEmptyName_ShouldThrowValidationException() {
         Film film = Film.builder()

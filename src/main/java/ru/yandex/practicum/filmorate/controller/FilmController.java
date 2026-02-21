@@ -18,7 +18,7 @@ import java.util.Map;
 public class FilmController {
 
     private final Map<Long, Film> films = new HashMap<>();
-    LocalDate firstDate = LocalDate.of(1895, 12, 28);
+    private LocalDate firstDate = LocalDate.of(1895, 12, 28);
 
     private long getNextId() {
         long currentMaxId = films.keySet()
