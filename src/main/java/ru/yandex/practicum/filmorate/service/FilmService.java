@@ -46,7 +46,7 @@ public class FilmService {
         }
 
         // Установка ID
-        long nextId = getNextId();
+        long nextId = userStorage.getNextId();
         film.setId(nextId);
 
         filmStorage.addFilm(film);
@@ -145,12 +145,6 @@ public class FilmService {
         }
     }
 
-    private long getNextId() {
-        return filmStorage.getAllFilms().stream()
-                .mapToLong(Film::getId)
-                .max()
-                .orElse(0) + 1;
-    }
 
     private User getUserById(Long userId) {
         return userStorage.getUserById(userId)

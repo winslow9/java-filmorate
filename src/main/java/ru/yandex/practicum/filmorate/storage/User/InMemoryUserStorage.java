@@ -40,4 +40,12 @@ public class InMemoryUserStorage implements UserStorage {
     public boolean deleteUser(Long id) {
         return users.remove(id) != null;
     }
+
+    @Override
+    public long getNextId() {
+        return getAllUsers().stream()
+                .mapToLong(User::getId)
+                .max()
+                .orElse(0) + 1;
+    }
 }

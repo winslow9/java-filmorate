@@ -40,4 +40,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     public boolean deleteFilm(Long id) {
         return films.remove(id) != null;
     }
+
+    @Override
+    public long getNextId() {
+        return getAllFilms().stream()
+                .mapToLong(Film::getId)
+                .max()
+                .orElse(0) + 1;
+    }
 }

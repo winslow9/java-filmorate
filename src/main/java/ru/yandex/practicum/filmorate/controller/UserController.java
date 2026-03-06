@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.constraints.Positive;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -10,6 +12,7 @@ import java.util.Collection;
 @Slf4j
 @RestController
 @RestControllerAdvice
+@Validated
 @RequestMapping("/users")
 public class UserController {
 
@@ -26,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
+    public User getUserById(@Positive @PathVariable Long id) {
         log.info("Запрос на получение пользователя с id: {}", id);
         return userService.getUserById(id);
     }
@@ -44,25 +47,25 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+    public void addFriend(@Positive @PathVariable Long id, @Positive @PathVariable Long friendId) {
         log.info("Запрос на добавление в друзья: пользователь {} добавляет друга {}", id, friendId);
         userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
+    public void removeFriend(@Positive @PathVariable Long id, @Positive @PathVariable Long friendId) {
         log.info("Запрос на удаление из друзей: пользователь {} удаляет друга {}", id, friendId);
         userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
-    public Collection<User> getFriends(@PathVariable Long id) {
+    public Collection<User> getFriends(@Positive @PathVariable Long id) {
         log.info("Запрос на получение списка друзей пользователя с id: {}", id);
         return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Collection<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
+    public Collection<User> getCommonFriends(@Positive @PathVariable Long id, @Positive @PathVariable Long otherId) {
         log.info("Запрос на получение общих друзей пользователей {} и {}", id, otherId);
         return userService.getCommonFriends(id, otherId);
     }

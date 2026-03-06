@@ -35,7 +35,7 @@ public class UserService {
         validateUser(user);
 
         // Сетаем ID
-        long nextId = getNextId();
+        long nextId = userStorage.getNextId();
         user.setId(nextId);
 
         // Сетаем имя, если не указано
@@ -149,10 +149,4 @@ public class UserService {
         }
     }
 
-    private long getNextId() {
-        return userStorage.getAllUsers().stream()
-                .mapToLong(User::getId)
-                .max()
-                .orElse(0) + 1;
-    }
 }
