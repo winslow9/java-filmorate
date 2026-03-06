@@ -46,7 +46,7 @@ public class FilmService {
         }
 
         // Установка ID
-        long nextId = userStorage.getNextId();
+        long nextId = filmStorage.getNextId();
         film.setId(nextId);
 
         filmStorage.addFilm(film);
