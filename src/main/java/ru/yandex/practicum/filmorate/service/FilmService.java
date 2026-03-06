@@ -22,7 +22,7 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-    private final LocalDate first_film_date = LocalDate.of(1895, 12, 28);
+    private final LocalDate firstFilmDate = LocalDate.of(1895, 12, 28);
 
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
@@ -134,7 +134,7 @@ public class FilmService {
     }
 
     private void validateReleaseDate(LocalDate releaseDate) {
-        if (releaseDate != null && releaseDate.isBefore(first_film_date)) {
+        if (releaseDate != null && releaseDate.isBefore(firstFilmDate)) {
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
         }
     }
