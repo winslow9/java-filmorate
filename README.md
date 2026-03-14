@@ -1,2 +1,2 @@
 # java-filmorate
-![ER-диграмма](![erd.png](../../Pictures/erd.png))
+![ER-диграмма](https://disk.yandex.ru/i/JTbirQX5HYi1yw)
