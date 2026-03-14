@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NonNull;
 
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @Builder
@@ -19,5 +21,7 @@ public class User {
     @Email
     private String email;
     private LocalDate birthday;
+    private Set<Long> friends;
+        private Map<Long, Boolean> provedFriendship;
 }
 

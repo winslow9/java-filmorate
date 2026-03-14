@@ -1,2 +1,2 @@
 # java-filmorate
-Template repository for Filmorate project.
+![ER-диграмма](![erd.png](../../Pictures/erd.png))
