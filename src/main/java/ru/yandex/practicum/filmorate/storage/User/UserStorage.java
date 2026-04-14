@@ -1,12 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.User;
 
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
-@Component
 public interface UserStorage {
     Collection<User> getAllUsers();
 
@@ -16,7 +15,15 @@ public interface UserStorage {
 
     User updateUser(User user);
 
-    boolean deleteUser(Long id);
+    /*boolean deleteUser(Long id);*/
 
-    long getNextId();
+    /* long getNextId();*/
+
+    void addFriend(Long userId, Long friendId, boolean confirmed);
+
+    void removeFriend(Long userId, Long friendId);
+
+    Set<Long> getFriends(Long userId);
+
+    Set<Long> getCommonFriends(Long userId, Long otherUserId);
 }
