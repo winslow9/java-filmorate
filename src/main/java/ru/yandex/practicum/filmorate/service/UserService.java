@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -18,7 +19,7 @@ public class UserService {
     private final UserStorage userStorage;
     private final LocalDate today = LocalDate.now();
 
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -34,11 +35,6 @@ public class UserService {
     public User createUser(User user) {
         validateUser(user);
 
-        // Сетаем ID
-        long nextId = userStorage.getNextId();
-        user.setId(nextId);
-
-        // Сетаем имя, если не указано
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -47,9 +43,9 @@ public class UserService {
             user.setFriends(new HashSet<>());
         }
 
-        userStorage.addUser(user);
-        log.info("Создан пользователь с id: {}", user.getId());
-        return user;
+        User createdUser = userStorage.addUser(user);
+        log.info("Создан пользователь с id: {}", createdUser.getId());
+        return createdUser;
     }
 
     public User updateUser(User user) {
@@ -85,45 +81,49 @@ public class UserService {
     }
 
     public void addFriend(Long userId, Long friendId) {
-        if (userId.equals(friendId)) {
-            throw new ValidationException("Пользователь не может добавить самого себя в друзья");
-        }
+        log.info("=== Добавление друга: user={}, friend={} ===", userId, friendId);
 
-        User user = getUserById(userId);
-        User friend = getUserById(friendId);
+        getUserById(userId);
+        getUserById(friendId);
 
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+        userStorage.addFriend(userId, friendId, true);
 
-        log.info("Пользователь {} добавил в друзья {}", userId, friendId);
+        log.info("Друг успешно добавлен: {} -> {}", userId, friendId);
     }
 
     public void removeFriend(Long userId, Long friendId) {
-        User user = getUserById(userId);
-        User friend = getUserById(friendId);
+        log.info("=== Удаление друга: user={}, friend={} ===", userId, friendId);
 
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
+        getUserById(userId);
+        getUserById(friendId);
 
-        log.info("Пользователь {} удалил из друзей {}", userId, friendId);
+
+        userStorage.removeFriend(userId, friendId);
+
+        log.info("Друг успешно удален: {} -> {}", userId, friendId);
     }
 
     public Collection<User> getFriends(Long userId) {
-        User user = getUserById(userId);
-        return user.getFriends().stream()
-                .map(this::getUserById)
-                .collect(Collectors.toList());
+        log.info("=== Получение друзей пользователя: {} ===", userId);
+
+        getUserById(userId);
+
+        List<User> friends = userStorage.getFriendsWithDetails(userId);
+        log.info("Возвращено друзей: {}", friends.size());
+        return friends;
     }
 
     public Collection<User> getCommonFriends(Long userId, Long otherId) {
-        User user = getUserById(userId);
-        User other = getUserById(otherId);
+        log.info("=== Получение общих друзей пользователей {} и {} ===", userId, otherId);
+        getUserById(userId);
+        getUserById(otherId);
 
-        return user.getFriends().stream()
-                .filter(friendId -> other.getFriends().contains(friendId))
-                .map(this::getUserById)
-                .collect(Collectors.toList());
+        List<User> commonFriends = userStorage.getCommonFriendsWithDetails(userId, otherId);
+
+        log.info("Возвращено общих друзей: {}", commonFriends.size());
+        return commonFriends;
     }
+
 
     private void validateUser(User user) {
         validateEmail(user.getEmail());
@@ -148,5 +148,4 @@ public class UserService {
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
     }
-
 }
