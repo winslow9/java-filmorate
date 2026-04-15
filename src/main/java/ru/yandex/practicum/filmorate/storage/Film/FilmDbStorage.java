@@ -122,20 +122,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public boolean deleteFilm(Long id) {
-        String sql = "DELETE FROM FILMS WHERE id = ?";
-        int deleted = jdbcTemplate.update(sql, id);
-        return deleted > 0;
-    }
-
-    @Override
-    public long getNextId() {
-        String sql = "SELECT NEXT VALUE FOR FILMS_SEQUENCE";
-        Long maxId = jdbcTemplate.queryForObject("SELECT MAX(id) FROM FILMS", Long.class);
-        return (maxId == null ? 1 : maxId + 1);
-    }
-
-    @Override
     public void addLike(Long filmId, Long userId) {
         log.info("=== Добавление лайка: film={}, user={} ===", filmId, userId);
 
@@ -227,5 +213,17 @@ public class FilmDbStorage implements FilmStorage {
 
     private void deleteLikesByFilmId(Long filmId) {
         jdbcTemplate.update("DELETE FROM LINK_FILMLIKES WHERE film_id = ?", filmId);
+    }
+
+    @Override
+    public List<Film> getPopularFilmsWithLikes(int limit) {
+        String sql = "SELECT f.*, COUNT(fl.user_id) as likes_count " +
+                "FROM FILMS f " +
+                "LEFT JOIN LINK_FILMLIKES fl ON f.id = fl.film_id " +
+                "GROUP BY f.id " +
+                "ORDER BY likes_count DESC " +
+                "LIMIT ?";
+
+        return jdbcTemplate.query(sql, filmRowMapper, limit);
     }
 }

@@ -83,15 +83,10 @@ public class UserService {
     public void addFriend(Long userId, Long friendId) {
         log.info("=== Добавление друга: user={}, friend={} ===", userId, friendId);
 
-        // Проверяем, что оба пользователя существуют
         getUserById(userId);
         getUserById(friendId);
 
-        // Добавляем друга через storage
         userStorage.addFriend(userId, friendId, true);
-
-        // Для взаимной дружбы (опционально)
-        // userStorage.addFriend(friendId, userId, true);
 
         log.info("Друг успешно добавлен: {} -> {}", userId, friendId);
     }
@@ -113,29 +108,17 @@ public class UserService {
 
         getUserById(userId);
 
-        Set<Long> friendIds = userStorage.getFriends(userId);
-        log.info("Найдено ID друзей: {}", friendIds);
-
-        List<User> friends = friendIds.stream()
-                .map(this::getUserById)
-                .collect(Collectors.toList());
-
+        List<User> friends = userStorage.getFriendsWithDetails(userId);
         log.info("Возвращено друзей: {}", friends.size());
         return friends;
     }
 
     public Collection<User> getCommonFriends(Long userId, Long otherId) {
         log.info("=== Получение общих друзей пользователей {} и {} ===", userId, otherId);
-
         getUserById(userId);
         getUserById(otherId);
 
-        Set<Long> commonFriendIds = userStorage.getCommonFriends(userId, otherId);
-        log.info("Найдено общих ID друзей: {}", commonFriendIds);
-
-        List<User> commonFriends = commonFriendIds.stream()
-                .map(this::getUserById)
-                .collect(Collectors.toList());
+        List<User> commonFriends = userStorage.getCommonFriendsWithDetails(userId, otherId);
 
         log.info("Возвращено общих друзей: {}", commonFriends.size());
         return commonFriends;

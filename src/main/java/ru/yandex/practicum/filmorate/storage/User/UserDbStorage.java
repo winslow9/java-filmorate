@@ -28,7 +28,6 @@ public class UserDbStorage implements UserStorage {
     public Collection<User> getAllUsers() {
         String sql = "SELECT * FROM USERS";
         List<User> users = jdbcTemplate.query(sql, userRowMapper);
-        users.forEach(this::loadFriends);
         return users;
     }
 
@@ -117,10 +116,6 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sql, userId, friendId);
     }
 
-    public void confirmFriend(Long userId, Long friendId) {
-        String sql = "UPDATE FRIENDSHIPS SET friendship_type_id = ? WHERE user_id = ? AND friend_id = ?";
-        jdbcTemplate.update(sql, FriendshipType.CONFIRMED.getId(), userId, friendId);
-    }
 
     @Override
     public Set<Long> getFriends(Long userId) {
@@ -129,15 +124,6 @@ public class UserDbStorage implements UserStorage {
         return new HashSet<>(friends);
     }
 
-    public Set<Long> getPendingFriends(Long userId) {
-        String sql = """
-                SELECT friend_id 
-                FROM FRIENDSHIPS 
-                WHERE user_id = ? AND friendship_type_id = ?
-                """;
-        List<Long> friends = jdbcTemplate.queryForList(sql, Long.class, userId, FriendshipType.UNCONFIRMED.getId());
-        return new HashSet<>(friends);
-    }
 
     @Override
     public Set<Long> getCommonFriends(Long userId, Long otherUserId) {
@@ -168,13 +154,31 @@ public class UserDbStorage implements UserStorage {
     }
 
 
-    public boolean areFriends(Long userId, Long friendId) {
+    public List<User> getFriendsWithDetails(Long userId) {
         String sql = """
-                SELECT COUNT(*) 
-                FROM FRIENDSHIPS 
-                WHERE user_id = ? AND friend_id = ? AND friendship_type_id = ?
-                """;
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId, friendId, FriendshipType.CONFIRMED.getId());
-        return count != null && count > 0;
+        SELECT u.* FROM USERS u
+        JOIN FRIENDSHIPS f ON u.id = f.friend_id
+        WHERE f.user_id = ? AND f.friendship_type_id = ?
+        """;
+        return jdbcTemplate.query(sql, userRowMapper, userId, FriendshipType.CONFIRMED.getId());
+    }
+
+    @Override
+    public List<User> getCommonFriendsWithDetails(Long userId, Long otherId) {
+        String sql = """
+        SELECT u.* FROM USERS u
+        WHERE u.id IN (
+            SELECT f1.friend_id FROM FRIENDSHIPS f1
+            WHERE f1.user_id = ? AND f1.friendship_type_id = ?
+            INTERSECT
+            SELECT f2.friend_id FROM FRIENDSHIPS f2
+            WHERE f2.user_id = ? AND f2.friendship_type_id = ?
+        )
+        """;
+
+        return jdbcTemplate.query(sql, userRowMapper,
+                userId, FriendshipType.CONFIRMED.getId(),
+                otherId, FriendshipType.CONFIRMED.getId()
+        );
     }
 }

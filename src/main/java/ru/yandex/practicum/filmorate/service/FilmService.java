@@ -135,11 +135,9 @@ public class FilmService {
     public void addLike(Long filmId, Long userId) {
         log.info("Добавление лайка: фильм {}, пользователь {}", filmId, userId);
 
-        // Проверяем, что фильм и пользователь существуют
         getFilmById(filmId);
         getUserById(userId);
 
-        // Сохраняем лайк в базу данных
         filmStorage.addLike(filmId, userId);
 
         log.info("Лайк успешно добавлен: фильм {}, пользователь {}", filmId, userId);
@@ -156,18 +154,6 @@ public class FilmService {
         log.info("Лайк успешно удален: фильм {}, пользователь {}", filmId, userId);
     }
 
-    /*public List<Film> getTopFilms(Integer count) {
-        if (count == null || count <= 0) {
-            count = 10; // значение по умолчанию
-        }
-
-        return filmStorage.getAllFilms().stream()
-                .sorted(Comparator.comparingInt(
-                        (Film f) -> f.getLikes().size()
-                ).reversed())
-                .limit(count)
-                .collect(Collectors.toList());
-    }*/
 
     private void validateFilm(Film film) {
         validateName(film.getName());
@@ -249,36 +235,10 @@ public class FilmService {
                 .build();
     }
 
-    /*public List<FilmDto> convertToDtoList(Collection<Film> films) {
-        if (films == null) {
-            return Collections.emptyList();
-        }
-        return films.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-
-    private FilmDto.GenreDto convertGenre(Integer genreId) {
-        Genre genre = Genre.fromId(genreId);
-        if (genre == null) {
-            throw new NotFoundException("Жанр с id " + genreId + " не найден");
-        }
-        return FilmDto.GenreDto.builder()
-                .id(genre.getId())
-                .name(genre.getName())
-                .build();
-    }*/
 
     public List<Film> getPopularFilms(Integer count) {
         int limit = (count == null || count < 1) ? 10 : count;
         log.info("Получение топ-{} фильмов по количеству лайков", limit);
-
-        // Получаем все фильмы с уже загруженными лайками
-        return filmStorage.getAllFilms().stream()
-                .sorted(Comparator.comparingInt(
-                        (Film film) -> film.getLikes() != null ? film.getLikes().size() : 0
-                ).reversed())
-                .limit(limit)
-                .collect(Collectors.toList());
+        return filmStorage.getPopularFilmsWithLikes(limit);
     }
 }
